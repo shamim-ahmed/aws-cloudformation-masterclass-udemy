@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Designer':
+    df11f36e-dcbe-42bc-8245-c4bc041cf7ad:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 490
+        'y': 120
+      z: 0
+      embeds: []
+      isassociatedwith:
+        - 9a721144-7763-496b-b6ff-297578120870
+        - 873b72ae-5a41-4380-b27f-a249e454728c
+    eba87d7a-2a17-44c6-9a7c-a0fb4e40cba4:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 220
+        'y': 120
+      z: 0
+      embeds: []
+      isassociatedwith:
+        - df11f36e-dcbe-42bc-8245-c4bc041cf7ad
+    9a721144-7763-496b-b6ff-297578120870:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 360
+        'y': 30
+      z: 0
+      embeds: []
+    873b72ae-5a41-4380-b27f-a249e454728c:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 360
+        'y': 230
+      z: 0
+    84a43d87-10f0-4da7-8bdd-304c75a2fb02:
+      source:
+        id: df11f36e-dcbe-42bc-8245-c4bc041cf7ad
+      target:
+        id: 873b72ae-5a41-4380-b27f-a249e454728c
+      z: 11
+Resources:
+  MyEC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-0742b4e673072066f
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        - !Ref MySSHSecurityGroup
+        - !Ref MyServerSecurityGroup
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: df11f36e-dcbe-42bc-8245-c4bc041cf7ad
+  MyElasticIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      InstanceId: !Ref MyEC2Instance
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: eba87d7a-2a17-44c6-9a7c-a0fb4e40cba4
+  MySSHSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Security Group to provide SSH access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 9a721144-7763-496b-b6ff-297578120870
+  MyServerSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Security Group to provide HTTP access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 192.168.1.1/32
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 873b72ae-5a41-4380-b27f-a249e454728c
