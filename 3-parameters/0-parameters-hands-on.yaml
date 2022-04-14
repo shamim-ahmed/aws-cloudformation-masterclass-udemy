@@ -1,0 +1,93 @@
+Parameters:
+  SecurityGroupDescription:
+    Description: Security group description (Simple parameter)
+    Type: String
+
+  SecurityGroupPort:
+    Description: Simple description of a number parameter, with min and max value
+    Type: Number
+    MinValue: 1150
+    MaxValue: 65535
+  
+  InstanceType:
+    Description: EC2 instance type (has default, allowed values)
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t1.micro
+      - t2.nano
+      - t2.micro
+      - t2.small
+    ConstraintDescription: Must be a valid EC2 instance type
+
+  DbPwd:
+    Description: Database password (will not be echoed)
+    Type: String
+    NoEcho: true
+
+  KeyName:
+    Description: Name of an existing EC2 keypair
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: Must be the name of an existing EC2 key pair
+
+  SecurityGroupIngressCidr:
+    Description: The IP address range that can be used to communicate with EC2 instance
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+    Default: '0.0.0.0/0'
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
+    ConstraintDescription: Must be a valid IP CIDR range in the format x.x.x.x/x
+  
+  MyVpc:
+    Description: The VPC to operate in
+    Type: AWS::EC2::VPC::Id
+
+  MySubnetIds:
+    Description: A list of subnet IDs
+    Type: List<AWS::EC2::Subnet::Id>
+
+  DbSubnetIpBlocks:
+    Description: Comma delimited list of three CIDR blocks
+    Type: CommaDelimitedList
+    # please check your existing subnets to ensure that CIDR ranges are not in conflict
+    Default: "172.31.128.0/28, 172.31.128.16/28, 172.31.128.32/28"
+
+Resources:
+  MyEC2Instace:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0742b4e673072066f
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      SubnetId: !Ref DbSubnet1
+
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription:  !Ref SecurityGroupDescription
+      VpcId: !Ref MyVpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref SecurityGroupPort
+          ToPort: !Ref SecurityGroupPort
+          CidrIp: !Ref SecurityGroupIngressCidr
+
+
+  DbSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Select [0, !Ref DbSubnetIpBlocks]
+      VpcId: !Ref MyVpc
+
+  DbSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Select [1, !Ref DbSubnetIpBlocks]
+      VpcId: !Ref MyVpc
+
+  DbSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Select [2, !Ref DbSubnetIpBlocks]
+      VpcId: !Ref MyVpc
