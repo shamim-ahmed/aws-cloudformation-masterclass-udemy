@@ -57,6 +57,7 @@ Resources:
   MyEC2Instace:
     Type: AWS::EC2::Instance
     Properties:
+      # This image id will work only in us-east-1 region
       ImageId: ami-0742b4e673072066f
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName
