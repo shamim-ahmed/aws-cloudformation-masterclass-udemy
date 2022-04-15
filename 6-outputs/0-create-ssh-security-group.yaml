@@ -1,0 +1,29 @@
+Resources:
+  MyCompanyWideSecurityGroup:
+    # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html    
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 10.0.48.0/24
+          Description: Finance team network
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 10.0.112.0/24
+          Description: Marketing team network
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 10.0.176.0/24
+          Description: Application support team network
+
+Outputs:
+  StackSSHSecurityGroup:
+    Description: The SSH Security Group for our company
+    Value: !Ref MyCompanyWideSecurityGroup
+    Export:
+      Name: SSHSecurityGroup
