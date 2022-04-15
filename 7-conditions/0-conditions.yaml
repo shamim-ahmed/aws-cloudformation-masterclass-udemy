@@ -1,0 +1,46 @@
+Parameters:
+  ImageId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+
+  EnvironmentName:
+    Description: name of the environment
+    Type: String
+    Default: test
+    AllowedValues:
+      - test
+      - prod
+    ConstraintDescription: Must be test or prod
+
+Conditions:
+  CreateProdResources: !Equals [!Ref EnvironmentName, prod]
+
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref ImageId
+      InstanceType: t2.micro
+
+  NewVolume:
+    Type: AWS::EC2::Volume
+    Condition: CreateProdResources
+    Properties:
+      Size: 100
+      VolumeType: gp2
+      AvailabilityZone: !GetAtt MyEC2Instance.AvailabilityZone
+
+  MountPoint:
+    Type: AWS::EC2::VolumeAttachment
+    Condition: CreateProdResources
+    Properties:
+      InstanceId: !Ref MyEC2Instance
+      VolumeId: !Ref NewVolume
+      Device: /dev/sdh
+
+Outputs:
+  VolumeId:
+    Condition: CreateProdResources
+    Value: !Ref NewVolume
+    Export:
+      Name: NewVolumeId
