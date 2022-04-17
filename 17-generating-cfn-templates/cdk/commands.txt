@@ -1,0 +1,32 @@
+# install the CDK
+sudo npm install -g aws-cdk
+
+# create a directory for the demo project in question
+mkdir cdk-app-dynamodb
+cd cdk-app-dynamodb/
+
+# initialize the application
+cdk init --language typescript
+
+# bootstrap
+cdk bootstrap
+
+# verify it works correctly
+cdk ls
+
+# install the necessary packages as required
+npm install @aws-cdk/aws-ec2 
+npm install @aws-cdk/aws-dynamodb
+npm install @aws-cdk/aws-s3
+npm install @aws-cdk/aws-iam
+npm install @aws-cdk/aws-lambda
+npm install @aws-cdk/aws-lambda-event-sources
+
+## Other Useful commands
+
+* `npm run build`   compile typescript to js
+* `npm run watch`   watch for changes and compile
+* `npm run test`    perform the jest unit tests
+* `cdk deploy`      deploy this stack to your default AWS account/region
+* `cdk diff`        compare deployed stack with current state
+* `cdk synth`       emits the synthesized CloudFormation template
