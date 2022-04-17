@@ -1,0 +1,11 @@
+Transform: 
+  - Count
+
+Resources:
+  MyBucket:
+    Type: AWS::S3::Bucket
+    Count: 3
+    Properties:
+      Tags:
+        - Key: Label
+          Value: My bucket %d
