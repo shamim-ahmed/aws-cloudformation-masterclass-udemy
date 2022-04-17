@@ -1,0 +1,95 @@
+Parameters:
+  ImageId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Description: The AMI id
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+
+  SSHLocation:
+    Type: String
+    Description: The location from which EC2 instance will allow SSH
+    Default: '0.0.0.0/0'
+    MinLength: 9
+    MaxLength: 18
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
+    ConstraintDescription: Must be a valid IP of the format x.x.x.x/x
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: The name of the EC2 Key Pair
+
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Metadata:
+      Comment: Install a simple PHP application
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            yum:
+              httpd: []
+              php: []
+          sources:
+            "/home/ec2-user/aws-cli": "https://github.com/aws/aws-cli/archive/refs/heads/develop.zip"
+          commands:
+            01_customizeHomePage:
+              command: echo "<html><body><h1>Hello world from ${STACK_NAME}</h1></body></html>" > /var/www/html/index.html
+              env: 
+                STACK_NAME: !Ref AWS::StackName 
+              cwd: "~"
+            02_dumpPhpInfo:
+              command: echo "<?php phpinfo(); ?>" > /var/www/html/phpinfo.php
+              cwd: "~"
+            03_changeDirectoryPermission:
+              command: |
+                if [ -d "$SOURCE_DIR" ]; then
+                  find $SOURCE_DIR -type d -exec sudo chmod 2775 {} \;
+                fi
+              env:
+                SOURCE_DIR: /home/ec2-user/aws-cli
+              cwd: "~"
+            04_changeFilePermission:
+              command: | 
+                if [ -d "$SOURCE_DIR" ]; then
+                  find $SOURCE_DIR -type f -exec sudo chmod 0664 {} \;
+                fi
+              env:
+                SOURCE_DIR: /home/ec2-user/aws-cli
+              cwd: "~"
+          services:
+            sysvinit:
+              httpd:
+                enabled: "true"
+                ensureRunning: "true"
+    Properties:
+      ImageId: !Ref ImageId
+      InstanceType: t2.micro
+      KeyName: !Ref KeyName
+      SecurityGroups:
+        - !Ref MySecurityGroup
+      UserData: 
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum update -y
+          
+          # install aws-cfn-bootstrap package
+          yum install -y aws-cfn-bootstrap
+          
+          # start cfn-init
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource MyEC2Instance --region ${AWS::Region}
+
+          # when cfn-init completes, send a signal
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource MyEC2Instance --region ${AWS::Region}
+
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: The security group to allow HTTP and SSH access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: '0.0.0.0/0'
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHLocation
