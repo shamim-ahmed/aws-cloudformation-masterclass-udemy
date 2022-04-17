@@ -1,2 +1,5 @@
 # exclude vscode configuration files
 .vscode
+
+# Ignore SAM build folder
+.aws-sam/
