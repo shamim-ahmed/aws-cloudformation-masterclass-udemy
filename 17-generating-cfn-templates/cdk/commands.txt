@@ -8,9 +8,6 @@ cd cdk-app-dynamodb/
 # initialize the application
 cdk init --language typescript
 
-# bootstrap
-cdk bootstrap
-
 # verify it works correctly
 cdk ls
 
@@ -21,6 +18,14 @@ npm install @aws-cdk/aws-s3
 npm install @aws-cdk/aws-iam
 npm install @aws-cdk/aws-lambda
 npm install @aws-cdk/aws-lambda-event-sources
+
+# build the project
+npm run build
+
+# bootstrap and deploy
+cdk bootstrap
+cdk deploy
+
 
 ## Other Useful commands
 
