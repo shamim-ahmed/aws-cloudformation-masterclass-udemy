@@ -1,0 +1,31 @@
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: The id of the VPC for security group
+
+  TemplateURL:
+    Type: String
+    Description: The template URL for the nested stack
+
+  ImageId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+    Description: The ami id for Amazon Linux
+
+Resources:
+  SSHSecurityGroupStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Ref TemplateURL
+      Parameters:
+        ApplicationName: !Ref AWS::StackName
+        VpcId: !Ref VpcId
+      TimeoutInMinutes: 5
+
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref ImageId
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        - !GetAtt SSHSecurityGroupStack.Outputs.SSHGroupId
