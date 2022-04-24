@@ -1,0 +1,8 @@
+# create wordpress stack in us-east-1 region
+https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://s3.us-east-1.amazonaws.com/cloudformation-templates-us-east-1/WordPress_Single_Instance.template&stackName=MyWPBlog&param_DBName=mywpblog&param_InstanceType=t2.micro&param_KeyName=MyEC2KeyPair-Virginia
+
+# create wordpress stack in eu-central-1 region
+https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/create/review?templateURL=https://s3.eu-central-1.amazonaws.com/cloudformation-templates-eu-central-1/WordPress_Single_Instance.template&stackName=MyWPBlog&param_DBName=mywpblog&param_InstanceType=t2.medium&param_KeyName=MyEC2KeyPair-Frankfurt
+
+# use a custom template
+https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateUrl=https%3A%2F%2Fshamim-cfn-templates.s3.amazonaws.com%2F0-parameters-hands-on.yaml&stackName=MyDemoStack&param_DbSubnetIpBlocks=172.31.128.0%2F28%2C%20172.31.128.16%2F28%2C%20172.31.128.32%2F28&param_InstanceType=t2.micro&param_KeyName=MyEC2KeyPair-Virginia&param_MyVpc=vpc-d4d889af&param_SecurityGroupDescription=test%20description&param_SecurityGroupIngressCidr=0.0.0.0%2F0&param_SecurityGroupPort=8080

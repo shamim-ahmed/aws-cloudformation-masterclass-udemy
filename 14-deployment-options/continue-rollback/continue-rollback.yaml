@@ -1,0 +1,24 @@
+Parameters:
+  ImageId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Description: The AMI id for EC2 instance
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+
+Resources:
+  MyAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+        - !Select
+            - 0
+            - Fn::GetAZs: !Ref AWS::Region
+      DesiredCapacity: 1
+      MaxSize: 1
+      MinSize: 1
+      LaunchConfigurationName: !Ref MyLaunchConfig
+
+  MyLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Ref ImageId
+      InstanceType: t2.micro
