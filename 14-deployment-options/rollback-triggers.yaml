@@ -1,0 +1,31 @@
+Parameters:
+  TableName:
+    Type: String
+    Description: The name of the DynamoDB table
+  RCU:
+    Type: Number
+    Description: Number of Read Capacity Units for the table
+    Default: 5
+  WCU:
+    Type: Number
+    Description: Number of Write Capacity Units for the table
+    Default: 5
+
+Resources:
+  MyDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref TableName
+      AttributeDefinitions:
+        - AttributeName: Album
+          AttributeType: S
+        - AttributeName: Artist
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Album
+          KeyType: HASH
+        - AttributeName: Artist
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref RCU
+        WriteCapacityUnits: !Ref WCU
